@@ -1,0 +1,61 @@
+{
+  "name": "dsh-ima",
+  "version": "0.1.0",
+  "description": "让 DeepSeek Harness 调用腾讯 ima 知识库：把 ima 的检索 / 问答 / 知识库能力暴露为原生工具（ima_health、ima_search、ima_ask、ima_kb_list、ima_import），双后端 —— ima 桌面客户端 CDP 驱动 + 可配置 HTTP 接口。",
+  "type": "module",
+  "main": "lib/index.js",
+  "exports": {
+    ".": "./lib/index.js",
+    "./cordis.patch.yml": "./cordis.patch.yml",
+    "./package.json": "./package.json"
+  },
+  "keywords": [
+    "deepseek-harness",
+    "dsh",
+    "dsh-plugin",
+    "dsh-bundle",
+    "ima",
+    "tencent-ima",
+    "ima.copilot",
+    "knowledge-base",
+    "rag",
+    "tool"
+  ],
+  "license": "MIT",
+  "icon": "./icon.svg",
+  "author": "0131kikimy",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/0131kikimy/dsh-ima.git"
+  },
+  "homepage": "https://github.com/0131kikimy/dsh-ima#readme",
+  "bugs": {
+    "url": "https://github.com/0131kikimy/dsh-ima/issues"
+  },
+  "engines": {
+    "node": "^22.19.0 || >=24.0.0"
+  },
+  "os": [
+    "win32",
+    "darwin",
+    "linux"
+  ],
+  "files": [
+    "lib",
+    "locale",
+    "icon.svg",
+    "cordis.patch.yml",
+    "README.md",
+    "CHANGELOG.md",
+    "LICENSE"
+  ],
+  "scripts": {
+    "selfcheck": "node test/selfcheck.mjs",
+    "probe": "node test/probe-app.mjs"
+  },
+  "dsh": {
+    "bundle": {
+      "patch": "./cordis.patch.yml"
+    }
+  }
+}

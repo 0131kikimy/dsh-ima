@@ -1,0 +1,22 @@
+# dsh-ima — bundle patch（DSH 原生插件）
+#
+# 一行 `- insert:`：把本包入口按【包名】插进组合树。
+# 为什么必须插一行 `name` = 本包包名：DSH 的 patch 行按**包名**（而不是相对源码路径）
+# 引用包，Node 的模块解析才能找到已安装的代码；`package.json#main` 不会因为包被列进
+# profile 的 bundles 就自动执行。缺这一行 = 入口从不被 import = 工具一个都不注册。
+#
+# 默认配置刻意保守：
+#   · `backend: auto` —— 配了 `http.baseUrl` 就走 HTTP（能读回答案/检索/知识库），
+#     没配就走本机 ima 桌面客户端（只能体检与唤起）。
+#   · `app.allowDelivery: false` —— 桌面「投递问题」是实验能力（猜输入框位置），默认关闭。
+# 改这里或改 profile 的 `cordis.patch.yml` 同 id 行均可；非法值会在加载期响亮失败。
+- insert:
+    - id: dsh-ima
+      name: dsh-ima
+      config:
+        backend: auto
+        app:
+          executable: ''
+          allowDelivery: false
+        http:
+          baseUrl: ''

@@ -1,0 +1,6 @@
+{
+  "meta": {
+    "title": "dsh-ima Tencent ima knowledge base",
+    "description": "Call Tencent ima from DeepSeek Harness: exposes ima search / ask / knowledge-base abilities as native tools (ima_health, ima_search, ima_ask, ima_kb_list, ima_import) over the local ima desktop client or a configurable HTTP endpoint."
+  }
+}

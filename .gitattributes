@@ -1,0 +1,4 @@
+# 统一换行：仓库内存 LF，避免 Windows 检出时整文件 diff 抖动。
+* text=auto eol=lf
+*.png binary
+*.ico binary
