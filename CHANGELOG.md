@@ -1,5 +1,21 @@
 # CHANGELOG
 
+## 0.3.0
+
+### 新增
+
+- **`ima_list_docs`**：列知识库内文档/文件夹（递归、分页、mediaId / 所在路径），补上"能看见库里有什么"的缺口。
+- **`ima_get_doc`**：按 mediaId 取正文 —— `get_media_info` 拿签名链接 → 下载原件 → 落临时文件 →
+  `pdftotext` 抽 PDF 文本；抽不出时如实回报 `extractor: unavailable` / `extractError`（扫描版需要 OCR），
+  签名 URL 不进工具输出。非 PDF 只下载原件，不自作解析。
+- 这两个工具让「必须引用原文」的任务（知识卡片、备课摘要、逐字核对引用）真正能由插件完成；
+  此前 `ima_search` 只返回标题，这类任务只能手工绕过插件。
+- 依赖 `pdftotext`（poppler / xpdf），可用环境变量 `DSH_IMA_PDFTOTEXT` 指定可执行文件路径；缺失时降级为"只下载原件"。
+
+### 修复
+
+- `lib/http.js` 缺失 4 组 `node:` 内置模块 import，导致上述两个函数在调用时抛 `ReferenceError`。
+
 ## 0.2.0
 
 ### 新增

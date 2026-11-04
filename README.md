@@ -16,11 +16,18 @@ plugin_manager(action: "install_bundle", target: "<本仓库的绝对路径>")
 | 工具 | 作用 | 需要什么 |
 | --- | --- | --- |
 | `ima_health` | 体检两条通道，回报**当前哪些能力真的可用**。排障第一步 | 无 |
+| `ima_settings` | 给出**可视化设置页**地址（填 Client ID / API Key，保存即生效） | 无 |
 | `ima_open` | 唤起 ima 桌面客户端（必要时拉起、把托盘窗口显示出来、摆回屏幕内），可让它打开一个网址 | 本机 ima |
 | `ima_ask` | 提问：配了 HTTP 接口 → 返回**答案 + 引用**；否则桌面"投递"（默认关闭的实验能力） | HTTP（推荐） |
-| `ima_search` | 在知识库里检索片段（title / snippet / url / score） | HTTP |
+| `ima_search` | 在知识库里检索（官方 API 下**只返回标题**，不含正文） | HTTP |
 | `ima_kb_list` | 列知识库（id / 名称 / 文档数） | HTTP |
+| `ima_list_docs` | 列知识库里的文档与文件夹（递归，给出 mediaId） | ima 官方 API |
+| `ima_get_doc` | **按 mediaId 取正文**：下载原件 + `pdftotext` 抽 PDF 文本 | ima 官方 API |
 | `ima_import` | 把 URL 或纯文本写入知识库（**写操作**） | HTTP |
+
+> **需要引用原文的任务（知识卡片、备课摘要、逐字核对）走这条链**：
+> `ima_kb_list` → `ima_list_docs`（拿 mediaId）→ `ima_get_doc`（拿正文）。
+> `ima_search` 只返回标题；`ima_ask` 在官方 API 下也只是标题级检索结果。
 
 ---
 

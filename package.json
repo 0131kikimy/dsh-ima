@@ -1,7 +1,7 @@
 {
   "name": "dsh-ima",
-  "version": "0.2.0",
-  "description": "让 DeepSeek Harness 调用腾讯 ima 知识库：把 ima 的检索 / 问答 / 知识库能力暴露为原生工具（ima_health、ima_search、ima_ask、ima_kb_list、ima_import），双后端 —— ima 桌面客户端 CDP 驱动 + 可配置 HTTP 接口。",
+  "version": "0.3.0",
+  "description": "让 DeepSeek Harness 调用腾讯 ima 知识库：把 ima 的检索 / 文档正文 / 知识库能力暴露成 9 个原生工具，支持在本机设置页可视化填入 API Key，双后端（ima 官方 OpenAPI + 桌面客户端）。",
   "type": "module",
   "main": "lib/index.js",
   "exports": {
