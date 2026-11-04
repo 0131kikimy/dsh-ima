@@ -56,7 +56,23 @@ node test/selfcheck.mjs
 
 ---
 
-## 配置
+## 可视化设置（推荐）
+
+装好之后直接对模型说「打开 ima 设置」/ 调用 `ima_settings`，它会给你一个**本机设置页地址**：
+
+```
+http://127.0.0.1:<dsh端口>/dsh-ima/settings?token=<一次性令牌>
+```
+
+页面上可以直接填写 **Client ID / API Key / 接口地址 / 默认知识库 / 检索条数 / ima 客户端路径**，
+点「保存」**立即生效**（写入 `$DSH_HOME/dsh-ima/settings.json`，无需重启），点「测试连接」会同时探测
+HTTP 接口与桌面客户端两条通道并回显真实状态。
+
+- 页面只监听本机，且必须带令牌才能读写（令牌首次启动生成并持久化，URL 跨重启稳定）。
+- 设置页保存的值**优先于** `cordis.patch.yml` 里的 `config`。
+- 若宿主没有 `webServer` 服务（非 Web 部署），设置页不出现，此时用下面的 YAML 方式配置。
+
+## 配置（YAML 方式）
 
 > 目前设置面板会显示 `unsupported`（本包用纯对象校验器，不依赖宿主包；以 `link:` 方式安装时也解析不到 schemastery）。
 > 请直接在 **profile 的 `cordis.patch.yml` 末尾追加**下面这段（`$DSH_PROFILE_DIR` 是当前 profile 目录）。

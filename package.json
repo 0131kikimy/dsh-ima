@@ -50,8 +50,10 @@
     "LICENSE"
   ],
   "scripts": {
-    "selfcheck": "node test/selfcheck.mjs",
-    "probe": "node test/probe-app.mjs"
+    "selfcheck": "node test/selfcheck.mjs"
+  },
+  "dependencies": {
+    "@deepseek-ai/schemastery": "^3.18.2"
   },
   "dsh": {
     "bundle": {

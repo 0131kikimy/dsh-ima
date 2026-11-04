@@ -22,3 +22,4 @@ Thumbs.db
 *.p12
 *.pfx
 .credentials*
+package-lock.json

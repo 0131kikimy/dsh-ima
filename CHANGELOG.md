@@ -4,6 +4,9 @@
 
 ### 新增
 
+- **可视化设置页**：`ima_settings` 返回本机设置页地址，可在浏览器里填写 Client ID / API Key /
+  baseUrl / 默认知识库 / topK / 客户端路径；保存即生效（写 `$DSH_HOME/dsh-ima/settings.json`），
+  并带「测试连接」（同时探测 HTTP 与桌面两条通道）。令牌鉴权，仅本机可访问。
 - `http.preset: ima` —— 直接接**腾讯 ima 官方 OpenAPI**（协议取自官方 `ima-skills` 包里的
   `ima_api.cjs`：`POST https://ima.qq.com/<apiPath>`，头 `ima-openapi-clientid` /
   `ima-openapi-apikey` / `ima-openapi-ctx`）。
