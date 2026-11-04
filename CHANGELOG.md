@@ -1,5 +1,19 @@
 # CHANGELOG
 
+## 0.2.0
+
+### 新增
+
+- `http.preset: ima` —— 直接接**腾讯 ima 官方 OpenAPI**（协议取自官方 `ima-skills` 包里的
+  `ima_api.cjs`：`POST https://ima.qq.com/<apiPath>`，头 `ima-openapi-clientid` /
+  `ima-openapi-apikey` / `ima-openapi-ctx`）。
+  - `ima_kb_list` → `openapi/wiki/v1/search_knowledge_base`
+  - `ima_search` → `openapi/wiki/v1/search_knowledge`（未指定知识库时按前 5 个库检索后合并）
+  - `ima_ask` → 检索汇总（官方接口**无问答生成**，答案首行如实标注）
+  - `ima_import` → `openapi/wiki/v1/import_urls`
+- `http.headers` —— 任意附加请求头，非 Bearer 鉴权（`X-Client-Id` / `X-Api-Key` 等）无需改代码。
+- `http.clientId` / `http.apiKey` / `http.skillVersion` 配置项。
+
 ## 0.1.0
 
 首个可用版本：把腾讯 ima 知识库暴露为 DSH 原生工具。

@@ -59,7 +59,32 @@ node test/selfcheck.mjs
 ## 配置
 
 > 目前设置面板会显示 `unsupported`（本包用纯对象校验器，不依赖宿主包；以 `link:` 方式安装时也解析不到 schemastery）。
-> 请直接在 **profile 的 `cordis.patch.yml` 末尾追加**下面这段（`$DSH_PROFILE_DIR` 是当前 profile 目录）：
+> 请直接在 **profile 的 `cordis.patch.yml` 末尾追加**下面这段（`$DSH_PROFILE_DIR` 是当前 profile 目录）。
+
+### 方式一：接 ima 官方 OpenAPI（推荐，能读回你账号里的知识库）
+
+在 <https://ima.qq.com/agent-interface> 领取 **API Key**（页面会给 `Client ID` 与 `API Key`），然后：
+
+```yaml
+- id: dsh-ima
+  config:
+    http:
+      preset: ima                 # 走腾讯 ima 官方 OpenAPI
+      clientId: 'YOUR_CLIENT_ID'  # 32 位十六进制
+      apiKey: 'YOUR_API_KEY'
+      skillVersion: 1.1.10        # 作为 ima-openapi-ctx 上报，按官方客户端默认值即可
+    knowledgeBase: ''             # 可选：默认知识库 id（ima_kb_list 可查）
+    topK: 8
+```
+
+协议来自官方 `ima-skills` 包里的 `ima_api.cjs`：`POST https://ima.qq.com/<apiPath>`，
+请求头 `ima-openapi-clientid` / `ima-openapi-apikey` / `ima-openapi-ctx: skill_version=…`。
+
+**能力边界（重要）**：ima 官方 OpenAPI 只有**知识库与笔记**接口，**没有问答生成接口**。
+所以接上之后：`ima_kb_list` / `ima_search` 返回真实数据；`ima_ask` 会退化为**检索汇总**，
+并在答案首行标注「ima 开放接口没有问答生成能力」。要真正的问答，需要另接带 LLM 的问答服务。
+
+### 方式二：接你自己的 REST 接口
 
 ```yaml
 - id: dsh-ima
@@ -68,10 +93,14 @@ node test/selfcheck.mjs
     knowledgeBase: ''      # 可选：默认知识库 id 或名称
     topK: 8                # 可选：检索条数
     http:
+      preset: generic
       baseUrl: 'https://your-ima-endpoint.example.com'
       token: 'YOUR_TOKEN'
       authHeader: Authorization     # 默认 Authorization
-      authScheme: 'Bearer '         # 默认 'Bearer '
+      authScheme: 'Bearer '         # 默认 'Bearer '；不需要前缀就留空
+      headers:                      # 可选：任意附加请求头（非 Bearer 鉴权用得上）
+        X-Client-Id: 'YOUR_CLIENT_ID'
+        X-Api-Key: 'YOUR_API_KEY'
       paths:
         ask: /v1/ask
         search: /v1/search

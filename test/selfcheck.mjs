@@ -34,11 +34,18 @@ console.log('── 1. 配置校验 ──────────────�
 
 console.log('── 2. HTTP 后端（本地 mock）──────────────────');
 const TOKEN = 'test-token-123';
+const CLIENT_ID = 'test-client-id';
 const received = [];
 const server = http.createServer((req, res) => {
   let body = '';
   req.on('data', (chunk) => { body += chunk; });
   req.on('end', () => {
+    // 两条鉴权路径都要成立：Bearer token，以及自定义 `X-Client-Id` 头。
+    if (req.headers['x-client-id'] !== CLIENT_ID) {
+      res.writeHead(403, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify({ error: 'missing x-client-id' }));
+      return;
+    }
     if (req.headers.authorization !== `Bearer ${TOKEN}`) {
       res.writeHead(401, { 'Content-Type': 'application/json' });
       res.end(JSON.stringify({ error: 'bad token' }));
@@ -67,7 +74,12 @@ await new Promise((resolve) => server.listen(0, '127.0.0.1', resolve));
 const port = server.address().port;
 const config = resolveConfig({
   backend: 'http',
-  http: { baseUrl: `http://127.0.0.1:${port}`, token: TOKEN, timeoutMs: 5000 },
+  http: {
+    baseUrl: `http://127.0.0.1:${port}`,
+    token: TOKEN,
+    timeoutMs: 5000,
+    headers: { 'X-Client-Id': CLIENT_ID },
+  },
   knowledgeBase: 'kb1',
   topK: 3,
 });
@@ -91,10 +103,18 @@ try {
   const imported = await httpBackend.importItem(config, { url: 'https://example.com/new' });
   check('import 返回 id/status', imported.id === 'doc-9' && imported.status === 'accepted', JSON.stringify(imported));
 
-  const wrong = resolveConfig({ backend: 'http', http: { baseUrl: `http://127.0.0.1:${port}`, token: 'wrong', timeoutMs: 3000 } });
+  const wrong = resolveConfig({
+    backend: 'http',
+    http: { baseUrl: `http://127.0.0.1:${port}`, token: 'wrong', timeoutMs: 3000, headers: { 'X-Client-Id': CLIENT_ID } },
+  });
   let authError = '';
   try { await httpBackend.kbList(wrong); } catch (error) { authError = String(error.message); }
-  check('鉴权失败报清晰错误', authError.includes('401'), authError);
+  check('token 错误报 401', authError.includes('401'), authError);
+
+  const noClientId = resolveConfig({ backend: 'http', http: { baseUrl: `http://127.0.0.1:${port}`, token: TOKEN, timeoutMs: 3000 } });
+  let clientError = '';
+  try { await httpBackend.kbList(noClientId); } catch (error) { clientError = String(error.message); }
+  check('缺少自定义头报 403（headers 生效性）', clientError.includes('403'), clientError);
 
   const dead = resolveConfig({ backend: 'http', http: { baseUrl: 'http://127.0.0.1:9', timeoutMs: 1500 } });
   let connError = '';
