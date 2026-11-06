@@ -1,6 +1,6 @@
 {
   "meta": {
     "title": "dsh-ima 腾讯 ima 知识库",
-    "description": "让 DSH 调用腾讯 ima：把 ima 的检索 / 问答 / 知识库能力暴露为原生工具（ima_health、ima_search、ima_ask、ima_kb_list、ima_import），同时支持 ima 桌面客户端与本机可配置的 HTTP 接口。"
+    "description": "在左侧栏「ima」里填好 API Key，就能让 AI 搜索你的 ima 知识库、读取文档正文；另附「打开 ima 客户端」。"
   }
 }

@@ -13,28 +13,22 @@
 #      does not belong to the ima process.
 #   3. GetForegroundWindow + PID check BEFORE every keystroke: refuse if ima does
 #      not own the foreground.
-#   4. Report what was actually verified (foregroundVerified / pointPid) instead of
-#      assuming the intent succeeded, and offer -DryRun to rehearse without acting.
 #
 # Actions:
 #   status - process count / real window handle / visibility / executable path
 #   ensure - start ima if needed, wait for a window, force it visible
 #   open   - ensure + focus, optionally open a URL (via imacopilot:// deep link)
-#   ask    - focus, verify ownership, click composer, paste question, press Enter
-#            (delivers only; cannot read the answer back - see lib/app.js)
 #
 # Output: exactly one line of JSON on stdout.
 param(
   [Parameter(Mandatory = $true)]
-  [ValidateSet('status', 'ensure', 'open', 'ask')]
+  [ValidateSet('status', 'ensure', 'open')]
   [string]$Action,
 
   [string]$Url = '',
-  [string]$Question = '',
   [string]$Executable = '',
   [int]$LaunchTimeoutMs = 20000,
-  [int]$SettleMs = 1200,
-  [switch]$DryRun
+  [int]$SettleMs = 1200
 )
 
 $ErrorActionPreference = 'Stop'
@@ -307,72 +301,6 @@ try {
       Emit ([ordered]@{ ok = $true; action = 'open'; url = $Url; windowHandle = $after.windowHandle; visible = $after.visible })
     }
 
-    'ask' {
-      if (-not $Question) { throw 'ask requires -Question' }
-      $status = Ensure-Running
-      $handle = [IntPtr]$status.windowHandle
-
-      # Order matters and is the whole fix: raise ima FIRST, prove it owns the
-      # foreground, and only then compute a click point from its (now truthful) rect.
-      Bring-ToFront $handle
-      $foregroundVerified = Assert-ImaForeground $handle
-
-      $rect = New-Object DshImaWin32+RECT
-      if (-not [DshImaWin32]::GetWindowRect($handle, [ref]$rect)) { throw 'cannot read ima window rect' }
-      $width = $rect.Right - $rect.Left
-      $height = $rect.Bottom - $rect.Top
-      $clickX = [int]($rect.Left + $width * 0.55)
-      # 0.10 (not 0.16): the composer is docked to the bottom of the content pane and
-      # its centre sits ~10% of the window height above the bottom edge. At 0.16 the
-      # click landed ~30px ABOVE the input (in the suggested-questions strip), so the
-      # typed text went nowhere. Verified against a 2560x1700 window.
-      $clickY = [int]($rect.Bottom - $height * 0.10)
-
-      # The point must really be ima's, checked BEFORE any click.
-      $pointPid = Assert-PointBelongsToIma $clickX $clickY
-
-      $result = [ordered]@{
-        ok = $true
-        action = 'ask'
-        delivered = $false
-        readBack = $false
-        dryRun = [bool]$DryRun
-        foregroundVerified = $foregroundVerified
-        pointPid = $pointPid
-        click = [ordered]@{ x = $clickX; y = $clickY }
-        rect = [ordered]@{ left = $rect.Left; top = $rect.Top; width = $width; height = $height }
-        windowHandle = [int]$handle
-      }
-
-      if (-not $DryRun) {
-        [void][DshImaWin32]::SetCursorPos($clickX, $clickY)
-        Start-Sleep -Milliseconds 120
-        [DshImaWin32]::mouse_event(0x0002, 0, 0, 0, [IntPtr]::Zero)
-        [DshImaWin32]::mouse_event(0x0004, 0, 0, 0, [IntPtr]::Zero)
-        Start-Sleep -Milliseconds 250
-        # The click may have moved focus: re-assert before touching the keyboard.
-        $foregroundVerified = Assert-ImaForeground $handle
-        $result.foregroundVerified = $foregroundVerified
-
-        Set-Clipboard -Value $Question
-        Start-Sleep -Milliseconds 150
-        [void](Assert-ImaForeground $handle)
-        [System.Windows.Forms.SendKeys]::SendWait('^a')
-        [System.Windows.Forms.SendKeys]::SendWait('{DEL}')
-        Start-Sleep -Milliseconds 100
-        [void](Assert-ImaForeground $handle)
-        [System.Windows.Forms.SendKeys]::SendWait('^v')
-        Start-Sleep -Milliseconds 300
-        [void](Assert-ImaForeground $handle)
-        [System.Windows.Forms.SendKeys]::SendWait('{ENTER}')
-        Start-Sleep -Milliseconds $SettleMs
-        $result.delivered = $true
-        # Post-check: report the truth, not the intention.
-        $result.deliveredWhileImaForeground = ((Get-ImaPids) -contains ([DshImaWin32]::PidOfWindow([DshImaWin32]::GetForegroundWindow())))
-      }
-
-      Emit $result
-    }
   }
 } catch {
   Emit ([ordered]@{ ok = $false; action = $Action; error = ($_.Exception.Message) })

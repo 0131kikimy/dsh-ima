@@ -1,11 +1,12 @@
 {
   "name": "dsh-ima",
-  "version": "0.3.0",
-  "description": "让 DeepSeek Harness 调用腾讯 ima 知识库：把 ima 的检索 / 文档正文 / 知识库能力暴露成 9 个原生工具，支持在本机设置页可视化填入 API Key，双后端（ima 官方 OpenAPI + 桌面客户端）。",
+  "version": "0.4.0",
+  "description": "让 DeepSeek Harness 读取腾讯 ima 知识库：左侧边栏「ima」里填好 API Key 即可搜索知识库、读取文档正文；另附一个工具把 ima 客户端唤起来。",
   "type": "module",
   "main": "lib/index.js",
   "exports": {
     ".": "./lib/index.js",
+    "./client": "./lib/client.js",
     "./cordis.patch.yml": "./cordis.patch.yml",
     "./package.json": "./package.json"
   },
@@ -18,7 +19,6 @@
     "tencent-ima",
     "ima.copilot",
     "knowledge-base",
-    "rag",
     "tool"
   ],
   "license": "MIT",
@@ -46,18 +46,19 @@
     "icon.svg",
     "cordis.patch.yml",
     "README.md",
-    "CHANGELOG.md",
     "LICENSE"
   ],
   "scripts": {
     "selfcheck": "node test/selfcheck.mjs"
   },
-  "dependencies": {
-    "@deepseek-ai/schemastery": "^3.18.2"
-  },
   "dsh": {
     "bundle": {
       "patch": "./cordis.patch.yml"
+    },
+    "client": {
+      "platform": "web",
+      "immediately": true,
+      "inject": []
     }
   }
 }

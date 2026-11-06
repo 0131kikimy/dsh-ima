@@ -129,7 +129,7 @@ try {
   const appConfig = resolveConfig({ backend: 'app' });
   const appHealth = await appBackend.health(appConfig);
   check('桌面后端返回体检结果', typeof appHealth === 'object' && 'reachable' in appHealth, JSON.stringify(appHealth).slice(0, 200));
-  check('桌面后端明确声明不能读回', appHealth.readBack === false);
+  check('桌面后端给出人话说明', typeof appHealth.note === 'string' && appHealth.note.length > 0);
   console.log(`     进程=${appHealth.processCount ?? '?'} 窗口=${appHealth.hasWindow ?? '?'} 可见=${appHealth.visible ?? '?'} 可执行=${appHealth.executable || '未找到'}`);
 } catch (error) {
   check('桌面后端体检不抛错', false, String(error.message));
