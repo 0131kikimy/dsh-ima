@@ -1,7 +1,7 @@
 {
   "name": "dsh-ima",
-  "version": "0.4.0",
-  "description": "让 DeepSeek Harness 读取腾讯 ima 知识库：左侧边栏「ima」里填好 API Key 即可搜索知识库、读取文档正文；另附一个工具把 ima 客户端唤起来。",
+  "version": "0.5.0",
+  "description": "让 DeepSeek Harness 读写腾讯 ima 知识库：左侧边栏「ima」填 API Key 即可搜索、读整篇文档、新建/追加笔记、上传文件与归档；共 16 个工具。",
   "type": "module",
   "main": "lib/index.js",
   "exports": {
